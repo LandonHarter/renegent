@@ -62,7 +62,7 @@ export default function RegisterForm() {
 									toast.error(error.message);
 									return;
 								}
-								router.push("/");
+								router.push(`/verify/sent?email=${email}`);
 							}}
 							className="grid gap-4"
 						>

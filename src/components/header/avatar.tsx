@@ -37,7 +37,7 @@ export default function HeaderAvatar({ user }: { user: User }) {
 					}}
 				>
 					<LogOut />
-					Sign Out
+					Logout
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

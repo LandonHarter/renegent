@@ -1,9 +1,8 @@
-import { Geist } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const font = Open_Sans({
 	subsets: ["latin"],
 });
 
@@ -14,7 +13,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${geistSans.variable} antialiased`}>
+			<body className={`${font.className} antialiased`}>
 				<Toaster richColors theme="light" />
 				{children}
 			</body>
