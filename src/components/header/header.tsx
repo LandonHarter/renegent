@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -78,7 +78,7 @@ export default function Header() {
 											{link.dropdownItems.map((item) => (
 												<li key={item.title}>
 													<NavigationMenuLink asChild>
-														<a
+														<Link
 															href={item.href}
 															className="group hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex gap-4 rounded-md p-3 leading-none no-underline outline-hidden transition-colors select-none"
 														>
@@ -92,7 +92,7 @@ export default function Header() {
 																	}
 																</p>
 															</div>
-														</a>
+														</Link>
 													</NavigationMenuLink>
 												</li>
 											))}
@@ -121,8 +121,12 @@ export default function Header() {
 				{/* Auth Buttons */}
 				<div className="flex items-center gap-2.5">
 					<Link href="/login" className="max-lg:hidden">
-						<Button variant="outline">
-							<span className="relative z-10">Login</span>
+						<Button
+							variant="outline"
+							className="group flex items-center gap-1"
+						>
+							<span className="z-10">Login</span>
+							<ArrowRight className="size-4 transition-transform duration-200 group-hover:-rotate-45" />
 						</Button>
 					</Link>
 

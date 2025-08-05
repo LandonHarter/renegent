@@ -1,19 +1,23 @@
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+	variable: "--font-geist-sans",
+	subsets: ["latin"],
 });
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body className={`${geistSans.variable} antialiased`}>
+				<Toaster richColors theme="light" />
+				{children}
+			</body>
+		</html>
+	);
 }
