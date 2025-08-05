@@ -11,7 +11,8 @@ import { authClient } from "@/auth/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function LoginForm() {
+export default function RegisterForm() {
+	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -44,15 +45,16 @@ export default function LoginForm() {
 						</div>
 						<Form
 							action={async (data: FormData) => {
-								if (!email || !password) {
+								if (!email || !password || !name) {
 									toast.error("Please fill in all fields");
 									return;
 								}
 
-								const { error } = await authClient.signIn.email(
+								const { error } = await authClient.signUp.email(
 									{
 										email,
 										password,
+										name,
 									}
 								);
 
@@ -60,14 +62,25 @@ export default function LoginForm() {
 									toast.error(error.message);
 									return;
 								}
-
-								toast.success("Logged in successfully");
 								router.push("/");
 							}}
 							className="grid gap-4"
 						>
 							{(ref, loading, setLoading) => (
 								<>
+									<div className="grid gap-2">
+										<Label htmlFor="name">Name</Label>
+										<Input
+											id="name"
+											type="name"
+											placeholder="John Doe"
+											name="name"
+											value={name}
+											onChange={(e) =>
+												setName(e.target.value)
+											}
+										/>
+									</div>
 									<div className="grid gap-2">
 										<Label htmlFor="email">Email</Label>
 										<Input
@@ -102,7 +115,7 @@ export default function LoginForm() {
 										setLoading={setLoading}
 										formRef={ref}
 									>
-										Log in
+										Register
 									</SubmitButton>
 								</>
 							)}
@@ -111,9 +124,9 @@ export default function LoginForm() {
 				</CardContent>
 			</Card>
 			<div className="mx-auto flex gap-1 text-sm">
-				<p>Don&apos;t have an account yet?</p>
-				<Link href="/register" className="underline">
-					Register
+				<p>Already have an account?</p>
+				<Link href="/login" className="underline">
+					Login
 				</Link>
 			</div>
 		</div>

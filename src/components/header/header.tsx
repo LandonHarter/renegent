@@ -15,6 +15,8 @@ import {
 	NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import { AuthState } from "@/hooks/use-auth-state";
+import HeaderAvatar from "./avatar";
 
 const ITEMS = [
 	{
@@ -46,7 +48,7 @@ const ITEMS = [
 	{ label: "Contact", href: "/contact" },
 ];
 
-export default function Header() {
+export default function Header({ authState }: { authState: AuthState }) {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -120,15 +122,19 @@ export default function Header() {
 
 				{/* Auth Buttons */}
 				<div className="flex items-center gap-2.5">
-					<Link href="/login" className="max-lg:hidden">
-						<Button
-							variant="outline"
-							className="group flex items-center gap-1"
-						>
-							<span className="z-10">Login</span>
-							<ArrowRight className="size-4 transition-transform duration-200 group-hover:-rotate-45" />
-						</Button>
-					</Link>
+					{authState.signedIn ? (
+						<HeaderAvatar user={authState.user} />
+					) : (
+						<Link href="/login" className="max-lg:hidden">
+							<Button
+								variant="outline"
+								className="group flex items-center gap-1"
+							>
+								<span className="z-10">Login</span>
+								<ArrowRight className="size-4 transition-transform duration-200 group-hover:-rotate-45" />
+							</Button>
+						</Link>
+					)}
 
 					{/* Hamburger Menu Button (Mobile Only) */}
 					<button
