@@ -17,7 +17,7 @@ export default async function DashboardLayout({
 				<DashboardSidebar user={user!} />
 				<div className="flex w-full flex-col overflow-x-hidden">
 					<DashboardHeader />
-					<main className="w-full px-6 py-2 pt-4">{children}</main>
+					<main className="w-full px-4 py-2 pt-3">{children}</main>
 				</div>
 			</SidebarProvider>
 			<div className="absolute flex h-screen w-screen flex-col items-center justify-center gap-2 px-8 lg:hidden">
