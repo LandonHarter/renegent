@@ -1,5 +1,7 @@
+import DashboardHeader from "@/components/dashboard/header";
 import DashboardSidebar from "@/components/dashboard/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useAuthState } from "@/hooks/use-auth-state";
 import Image from "next/image";
 
 export default async function DashboardLayout({
@@ -7,11 +9,14 @@ export default async function DashboardLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const { user } = await useAuthState();
+
 	return (
 		<div className="relative">
-			<SidebarProvider className="absolute grid grid-cols-[255px_1fr] max-md:hidden">
-				<DashboardSidebar />
+			<SidebarProvider className="absolute max-md:hidden">
+				<DashboardSidebar user={user!} />
 				<div className="flex w-full flex-col overflow-x-hidden">
+					<DashboardHeader />
 					<main className="w-full px-6 py-2 pt-4">{children}</main>
 				</div>
 			</SidebarProvider>

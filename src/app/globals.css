@@ -178,3 +178,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-thumb {
+    width: 5px;
+    border-radius: 13px;
+    background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #bebebe;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #a3a3a3;
+}
+
+::-moz-selection {
+    color: black;
+    background: #add8e6;
+}
+
+::selection {
+    color: black;
+    background: #add8e6;
+}

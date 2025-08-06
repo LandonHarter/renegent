@@ -1,0 +1,79 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import {
+	Breadcrumb,
+	BreadcrumbSeparator,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+} from "../ui/breadcrumb";
+import { Separator } from "../ui/separator";
+import { SidebarTrigger } from "../ui/sidebar";
+import { Fragment } from "react";
+
+type Links = {
+	href: string;
+	items: {
+		title: string;
+		href: string;
+	}[];
+};
+
+export const LINKS: Links[] = [
+	{
+		href: "/dashboard",
+		items: [
+			{
+				title: "Home",
+				href: "/dashboard",
+			},
+		],
+	},
+];
+
+export default function DashboardHeader() {
+	const pathname = usePathname();
+	const breadcrumbLinks = LINKS.find((link) =>
+		pathname.startsWith(link.href)
+	) as Links;
+
+	return (
+		<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+			<div className="flex items-center gap-2 px-4">
+				<SidebarTrigger className="-ml-1" />
+				<Separator
+					orientation="vertical"
+					className="mr-2 data-[orientation=vertical]:h-4"
+				/>
+				<Breadcrumb>
+					<BreadcrumbList>
+						{breadcrumbLinks.items.map((item, i) => (
+							<Fragment key={item.title}>
+								{i !== breadcrumbLinks.items.length - 1 ? (
+									<>
+										<BreadcrumbItem className="hidden md:block">
+											<BreadcrumbLink href={item.href}>
+												{item.title}
+											</BreadcrumbLink>
+										</BreadcrumbItem>
+										<BreadcrumbSeparator className="hidden md:block" />
+									</>
+								) : (
+									<>
+										<BreadcrumbItem>
+											<BreadcrumbPage>
+												{item.title}
+											</BreadcrumbPage>
+										</BreadcrumbItem>
+									</>
+								)}
+							</Fragment>
+						))}
+					</BreadcrumbList>
+				</Breadcrumb>
+			</div>
+		</header>
+	);
+}

@@ -3,6 +3,7 @@
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarHeader,
@@ -13,12 +14,47 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { ChevronRight, Home, LayoutDashboard } from "lucide-react";
+import {
+	BarChart2,
+	Box,
+	Braces,
+	Brain,
+	ChevronRight,
+	ChevronsUpDown,
+	Code,
+	CreditCard,
+	Database,
+	FileText,
+	GitPullRequest,
+	Home,
+	KeyRound,
+	LogOut,
+	PieChart,
+	Plus,
+	Server,
+	ShoppingCart,
+	Sparkles,
+	Store,
+	Webhook,
+	Wrench,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import SlideDown from "../animation/slide-down";
+import { User } from "@prisma/client";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { authClient } from "@/auth/client";
 
 type SidebarItem = {
 	title: string;
@@ -29,7 +65,8 @@ type SidebarItem = {
 type SidebarItemGroups = {
 	title: string;
 	icon: any;
-	items: SidebarItem[];
+	items?: SidebarItem[];
+	url?: string;
 };
 
 type SidebarGroup = {
@@ -42,15 +79,124 @@ const GROUPS = [
 		title: "General",
 		items: [
 			{
-				title: "Dashboard",
-				icon: LayoutDashboard,
+				title: "Home",
+				icon: Home,
+				url: "/dashboard/home",
+			},
+		],
+	},
+	{
+		title: "AI",
+		items: [
+			{
+				title: "Models",
+				icon: Brain,
 				items: [
 					{
-						title: "Home",
-						url: "/dashboard",
-						icon: Home,
+						title: "My Models",
+						icon: Box,
+						url: "/dashboard/models",
+					},
+					{
+						title: "Create Model",
+						icon: Plus,
+						url: "/dashboard/models/create",
+					},
+					{
+						title: "Model Templates",
+						icon: FileText,
+						url: "/dashboard/models/templates",
 					},
 				],
+			},
+			{
+				title: "Marketplace",
+				icon: Store,
+				items: [
+					{
+						title: "Model Marketplace",
+						icon: ShoppingCart,
+						url: "/dashboard/marketplace/models",
+					},
+					{
+						title: "Tool Marketplace",
+						icon: Wrench,
+						url: "/dashboard/marketplace/tools",
+					},
+				],
+			},
+		],
+	},
+	{
+		title: "Developers",
+		items: [
+			{
+				title: "Connection",
+				icon: GitPullRequest,
+				items: [
+					{
+						title: "API Keys",
+						icon: KeyRound,
+						url: "/dashboard/developers/keys",
+					},
+					{
+						title: "Endpoints",
+						icon: Server,
+						url: "/dashboard/developers/endpoints",
+					},
+				],
+			},
+			{
+				title: "Integrations",
+				icon: Braces,
+				items: [
+					{
+						title: "Webhooks",
+						icon: Webhook,
+						url: "/dashboard/developers/webhooks",
+					},
+					{
+						title: "SDKs",
+						icon: Code,
+						url: "/dashboard/developers/sdks",
+					},
+					{
+						title: "Dev Tools",
+						icon: Wrench,
+						url: "/dashboard/developers/devtools",
+					},
+				],
+			},
+		],
+	},
+	{
+		title: "Analytics",
+		items: [
+			{
+				title: "Usage",
+				icon: BarChart2,
+				items: [
+					{
+						title: "Overview",
+						icon: PieChart,
+						url: "/dashboard/analytics",
+					},
+					{
+						title: "Storage",
+						icon: Database,
+						url: "/dashboard/analytics/storage",
+					},
+					{
+						title: "Tools",
+						icon: Wrench,
+						url: "/dashboard/analytics/tools",
+					},
+				],
+			},
+			{
+				title: "Spending",
+				icon: CreditCard,
+				url: "/dashboard/analytics/spending",
 			},
 		],
 	},
@@ -58,12 +204,14 @@ const GROUPS = [
 
 const SIDEBAR_STATE_KEY = "sidebar-open-sections";
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ user }: { user: User }) {
 	const pathname = usePathname();
 	const [openSections, setOpenSections] = useState<Record<string, boolean>>(
 		{}
 	);
 	const [isHydrated, setIsHydrated] = useState(false);
+
+	const router = useRouter();
 
 	// Load saved state from localStorage on mount
 	useEffect(() => {
@@ -79,13 +227,15 @@ export default function DashboardSidebar() {
 			// Set intelligent defaults based on current route
 			const defaultState: Record<string, boolean> = {};
 			GROUPS.forEach((group) => {
-				group.items.forEach((item) => {
-					// Open section if current page is within this section
-					const isCurrentSectionActive = item.items.some((subItem) =>
-						pathname.startsWith(subItem.url)
-					);
-					defaultState[item.title] = isCurrentSectionActive;
-				});
+				group.items
+					.filter((item) => item.items)
+					.forEach((item) => {
+						// Open section if current page is within this section
+						const isCurrentSectionActive = item.items?.some(
+							(subItem) => pathname.startsWith(subItem.url)
+						);
+						defaultState[item.title] = isCurrentSectionActive!;
+					});
 			});
 			setOpenSections(defaultState);
 		}
@@ -133,55 +283,161 @@ export default function DashboardSidebar() {
 						{group.items.map((item, i) => (
 							<SidebarMenu key={i}>
 								<SidebarMenuItem>
-									<SidebarMenuButton
-										className="hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between transition-all duration-200"
-										onClick={() =>
-											toggleSection(item.title)
-										}
-									>
-										<div className="flex items-center gap-2">
-											<item.icon className="size-4" />
-											<span className="text-sm">
-												{item.title}
-											</span>
-										</div>
-										<ChevronRight
-											className={`ml-auto transition-transform duration-200 ${
-												openSections[item.title]
-													? "rotate-90"
-													: ""
-											}`}
-										/>
-									</SidebarMenuButton>
-									<SlideDown
-										isOpen={openSections[item.title]}
-									>
-										<SidebarMenuSub className="overflow-hidden">
-											{item.items.map((subItem, j) => (
-												<SidebarMenuSubItem
-													key={j + i + 1}
-													className="cursor-pointer"
-												>
-													<SidebarMenuSubButton
-														isActive={isActive(
-															subItem.url
-														)}
-														className="hover:bg-accent/50 transition-all duration-200"
-														href={subItem.url}
-													>
-														<subItem.icon className="size-4" />
-														{subItem.title}
-													</SidebarMenuSubButton>
-												</SidebarMenuSubItem>
-											))}
-										</SidebarMenuSub>
-									</SlideDown>
+									{item.items ? (
+										<>
+											<SidebarMenuButton
+												className="hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between transition-all duration-200"
+												onClick={() =>
+													toggleSection(item.title)
+												}
+											>
+												<div className="flex items-center gap-2">
+													<item.icon className="size-4" />
+													<span className="text-sm">
+														{item.title}
+													</span>
+												</div>
+												<ChevronRight
+													className={`ml-auto transition-transform duration-200 ${
+														openSections[item.title]
+															? "rotate-90"
+															: ""
+													}`}
+												/>
+											</SidebarMenuButton>
+											<SlideDown
+												isOpen={
+													openSections[item.title]
+												}
+											>
+												<SidebarMenuSub className="overflow-hidden">
+													{item.items.map(
+														(subItem, j) => (
+															<SidebarMenuSubItem
+																key={j + i + 1}
+																className="cursor-pointer"
+															>
+																<SidebarMenuSubButton
+																	isActive={isActive(
+																		subItem.url
+																	)}
+																	className="hover:bg-accent/50 transition-all duration-200"
+																	href={
+																		subItem.url
+																	}
+																>
+																	<subItem.icon className="size-4" />
+																	{
+																		subItem.title
+																	}
+																</SidebarMenuSubButton>
+															</SidebarMenuSubItem>
+														)
+													)}
+												</SidebarMenuSub>
+											</SlideDown>
+										</>
+									) : (
+										<Link href={item.url!}>
+											<SidebarMenuButton className="hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between transition-all duration-200">
+												<div className="flex items-center gap-2">
+													<item.icon className="size-4" />
+													<span className="text-sm">
+														{item.title}
+													</span>
+												</div>
+											</SidebarMenuButton>
+										</Link>
+									)}
 								</SidebarMenuItem>
 							</SidebarMenu>
 						))}
 					</SidebarGroup>
 				))}
 			</SidebarContent>
+			<SidebarFooter>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<DropdownMenu>
+							<DropdownMenuTrigger
+								asChild
+								className="cursor-pointer transition-all duration-150"
+							>
+								<SidebarMenuButton
+									size="lg"
+									className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+								>
+									<Avatar className="h-8 w-8 rounded-lg">
+										<AvatarImage
+											src={user.image!}
+											alt={user.name}
+										/>
+										<AvatarFallback className="rounded-lg">
+											{user.name?.charAt(0)}
+										</AvatarFallback>
+									</Avatar>
+									<div className="grid flex-1 text-left text-sm leading-tight">
+										<span className="truncate font-medium">
+											{user.name}
+										</span>
+										<span className="truncate text-xs">
+											{user.email}
+										</span>
+									</div>
+									<ChevronsUpDown className="ml-auto size-4" />
+								</SidebarMenuButton>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+								align="end"
+								sideOffset={4}
+							>
+								<DropdownMenuLabel className="p-0 font-normal">
+									<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+										<Avatar className="h-8 w-8 rounded-lg">
+											<AvatarImage
+												src={user.image!}
+												alt={user.name}
+											/>
+											<AvatarFallback className="rounded-lg">
+												{user.name?.charAt(0)}
+											</AvatarFallback>
+										</Avatar>
+										<div className="grid flex-1 text-left text-sm leading-tight">
+											<span className="truncate font-medium">
+												{user.name}
+											</span>
+											<span className="truncate text-xs">
+												{user.email}
+											</span>
+										</div>
+									</div>
+								</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuGroup>
+									<DropdownMenuItem>
+										<Sparkles />
+										Upgrade to Pro
+									</DropdownMenuItem>
+								</DropdownMenuGroup>
+								<DropdownMenuSeparator />
+								<DropdownMenuGroup>
+									<DropdownMenuItem
+										variant="destructive"
+										onClick={async () => {
+											await authClient.signOut();
+											router.push("/");
+										}}
+									>
+										<LogOut />
+										Log Out
+									</DropdownMenuItem>
+								</DropdownMenuGroup>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
