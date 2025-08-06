@@ -32,6 +32,21 @@ export const LINKS: Links[] = [
 		],
 	},
 	{
+		href: "/dashboard/developer/integration/keys",
+		items: [
+			{
+				title: "Developer",
+			},
+			{
+				title: "Integration",
+			},
+			{
+				title: "API Keys",
+				href: "/dashboard/developer/integration/keys",
+			},
+		],
+	},
+	{
 		href: "/dashboard/developer/integration/providers",
 		items: [
 			{

@@ -33,7 +33,6 @@ export default async function ProvidersPage() {
 					</div>
 				}
 			/>
-
 			<ProvidersForm initialData={providers} />
 		</DashboardWrapper>
 	);

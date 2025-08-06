@@ -25,6 +25,7 @@ model User {
   accounts      Account[]
   normalizedEmail String?
 
+  apiKeys ApiKey[]
   providers Providers?
 
   @@unique([email])
@@ -100,5 +101,21 @@ model Providers {
   perplexityApiKey String?
   perplexityBaseUrl String @default("https://api.perplexity.ai")
 
+  
+
   user User @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id String @id @default(uuid())
+  key String @unique
+
+  enabled Boolean @default(true)
+
+  name String
+  createdAt DateTime @default(now())
+  lastUsed DateTime?
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
