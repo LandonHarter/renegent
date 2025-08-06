@@ -13,11 +13,11 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { ChevronRight, Code, Key, Settings, Wrench } from "lucide-react";
+import { ChevronRight, Home, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SlideDown from "../animation/slide-down";
 
 type SidebarItem = {
@@ -39,27 +39,16 @@ type SidebarGroup = {
 
 const GROUPS = [
 	{
-		title: "Other",
+		title: "General",
 		items: [
 			{
-				title: "Settings",
-				icon: Settings,
+				title: "Dashboard",
+				icon: LayoutDashboard,
 				items: [
 					{
-						title: "General",
-						url: "/dashboard/settings/general",
-						icon: Wrench,
-					},
-				],
-			},
-			{
-				title: "Developers",
-				icon: Code,
-				items: [
-					{
-						title: "API Keys",
-						url: "/dashboard/developers/api-keys",
-						icon: Key,
+						title: "Home",
+						url: "/dashboard",
+						icon: Home,
 					},
 				],
 			},
@@ -67,14 +56,53 @@ const GROUPS = [
 	},
 ] as SidebarGroup[];
 
+const SIDEBAR_STATE_KEY = "sidebar-open-sections";
+
 export default function DashboardSidebar() {
 	const pathname = usePathname();
 	const [openSections, setOpenSections] = useState<Record<string, boolean>>(
 		{}
 	);
+	const [isHydrated, setIsHydrated] = useState(false);
+
+	// Load saved state from localStorage on mount
+	useEffect(() => {
+		const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+		if (savedState) {
+			try {
+				const parsedState = JSON.parse(savedState);
+				setOpenSections(parsedState);
+			} catch (error) {
+				console.warn("Failed to parse saved sidebar state:", error);
+			}
+		} else {
+			// Set intelligent defaults based on current route
+			const defaultState: Record<string, boolean> = {};
+			GROUPS.forEach((group) => {
+				group.items.forEach((item) => {
+					// Open section if current page is within this section
+					const isCurrentSectionActive = item.items.some((subItem) =>
+						pathname.startsWith(subItem.url)
+					);
+					defaultState[item.title] = isCurrentSectionActive;
+				});
+			});
+			setOpenSections(defaultState);
+		}
+		setIsHydrated(true);
+	}, [pathname]);
+
+	// Save state to localStorage whenever it changes
+	useEffect(() => {
+		if (isHydrated) {
+			localStorage.setItem(
+				SIDEBAR_STATE_KEY,
+				JSON.stringify(openSections)
+			);
+		}
+	}, [openSections, isHydrated]);
 
 	const isActive = (url: string) => pathname === url;
-
 	const toggleSection = (sectionTitle: string) => {
 		setOpenSections((prev) => ({
 			...prev,
@@ -95,7 +123,7 @@ export default function DashboardSidebar() {
 					/>
 				</Link>
 			</SidebarHeader>
-			<SidebarContent>
+			<SidebarContent className="flex flex-col">
 				{GROUPS.map((group) => (
 					<SidebarGroup
 						key={group.title}
