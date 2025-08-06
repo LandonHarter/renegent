@@ -17,7 +17,7 @@ type Links = {
 	href: string;
 	items: {
 		title: string;
-		href: string;
+		href?: string;
 	}[];
 };
 
@@ -40,7 +40,7 @@ export default function DashboardHeader() {
 	) as Links;
 
 	return (
-		<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+		<header className="border-border flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
 			<div className="flex items-center gap-2 px-4">
 				<SidebarTrigger className="-ml-1" />
 				<Separator
@@ -51,22 +51,28 @@ export default function DashboardHeader() {
 					<BreadcrumbList>
 						{breadcrumbLinks.items.map((item, i) => (
 							<Fragment key={item.title}>
-								{i !== breadcrumbLinks.items.length - 1 ? (
+								<BreadcrumbItem className="hidden md:block">
+									{item.href &&
+									i !== breadcrumbLinks.items.length - 1 ? (
+										<BreadcrumbLink href={item.href}>
+											{item.title}
+										</BreadcrumbLink>
+									) : (
+										<BreadcrumbPage
+											className={
+												i !==
+												breadcrumbLinks.items.length - 1
+													? "text-inherit"
+													: "text-foreground"
+											}
+										>
+											{item.title}
+										</BreadcrumbPage>
+									)}
+								</BreadcrumbItem>
+								{i !== breadcrumbLinks.items.length - 1 && (
 									<>
-										<BreadcrumbItem className="hidden md:block">
-											<BreadcrumbLink href={item.href}>
-												{item.title}
-											</BreadcrumbLink>
-										</BreadcrumbItem>
 										<BreadcrumbSeparator className="hidden md:block" />
-									</>
-								) : (
-									<>
-										<BreadcrumbItem>
-											<BreadcrumbPage>
-												{item.title}
-											</BreadcrumbPage>
-										</BreadcrumbItem>
 									</>
 								)}
 							</Fragment>

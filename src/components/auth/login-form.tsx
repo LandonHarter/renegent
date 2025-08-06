@@ -62,7 +62,7 @@ export default function LoginForm() {
 								}
 
 								toast.success("Logged in successfully");
-								router.push("/");
+								router.push("/dashboard");
 							}}
 							className="grid gap-4"
 						>

@@ -13,20 +13,20 @@ export default async function DashboardLayout({
 
 	return (
 		<div className="relative">
-			<SidebarProvider className="absolute max-md:hidden">
+			<SidebarProvider className="absolute max-lg:hidden">
 				<DashboardSidebar user={user!} />
 				<div className="flex w-full flex-col overflow-x-hidden">
 					<DashboardHeader />
 					<main className="w-full px-6 py-2 pt-4">{children}</main>
 				</div>
 			</SidebarProvider>
-			<div className="absolute flex h-screen w-screen flex-col items-center justify-center gap-2 px-8 md:hidden">
+			<div className="absolute flex h-screen w-screen flex-col items-center justify-center gap-2 px-8 lg:hidden">
 				<Image
-					src="/brand/full-transparent.svg"
-					alt="Draftl Logo"
+					src="/brand/logo-transparent.png"
+					alt="Renegent Logo"
 					width={256}
 					height={256}
-					className="aspect-[2563/1024] h-24 w-fit"
+					className="h-24 w-fit"
 				/>
 				<p className="text-foreground/50 text-center text-xl">
 					Please use a larger screen to view this page.
