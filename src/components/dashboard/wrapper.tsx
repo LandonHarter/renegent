@@ -3,5 +3,5 @@ export default function DashboardWrapper({
 }: {
 	children?: React.ReactNode;
 }) {
-	return <div className="flex w-full flex-col gap-4">{children}</div>;
+	return <div className="flex w-full flex-col gap-4 pb-4">{children}</div>;
 }

@@ -11,7 +11,7 @@ import {
 } from "../ui/breadcrumb";
 import { Separator } from "../ui/separator";
 import { SidebarTrigger } from "../ui/sidebar";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 type Links = {
 	href: string;
@@ -31,13 +31,32 @@ export const LINKS: Links[] = [
 			},
 		],
 	},
+	{
+		href: "/dashboard/developer/integration/providers",
+		items: [
+			{
+				title: "Developer",
+			},
+			{
+				title: "Integration",
+			},
+			{
+				title: "Connect Providers",
+				href: "/dashboard/developer/integration/providers",
+			},
+		],
+	},
 ];
 
 export default function DashboardHeader() {
 	const pathname = usePathname();
-	const breadcrumbLinks = LINKS.find((link) =>
-		pathname.startsWith(link.href)
-	) as Links;
+	const [breadcrumbLinks, setBreadcrumbLinks] = useState<Links | null>(null);
+
+	useEffect(() => {
+		setBreadcrumbLinks(
+			LINKS.find((link) => link.href.includes(pathname)) || null
+		);
+	}, [pathname]);
 
 	return (
 		<header className="border-border flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -49,7 +68,7 @@ export default function DashboardHeader() {
 				/>
 				<Breadcrumb>
 					<BreadcrumbList>
-						{breadcrumbLinks.items.map((item, i) => (
+						{breadcrumbLinks?.items.map((item, i) => (
 							<Fragment key={item.title}>
 								<BreadcrumbItem className="hidden md:block">
 									{item.href &&

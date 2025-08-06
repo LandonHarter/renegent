@@ -4,7 +4,7 @@ export default function DashboardTitle({
 	children,
 }: {
 	title: string;
-	description?: string;
+	description?: React.ReactNode;
 	children?: React.ReactNode;
 }) {
 	return (
@@ -12,9 +12,9 @@ export default function DashboardTitle({
 			<div className="flex flex-col gap-1">
 				<h1 className="text-2xl font-bold tracking-tight">{title}</h1>
 				{description && (
-					<p className="text-muted-foreground text-sm">
+					<div className="text-muted-foreground text-sm">
 						{description}
-					</p>
+					</div>
 				)}
 			</div>
 			<div className="flex items-center gap-2">{children}</div>

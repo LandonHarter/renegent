@@ -3,6 +3,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider = "zod-prisma-types"
+  output   = "../src/types"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -19,6 +24,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
   normalizedEmail String?
+
+  providers Providers?
 
   @@unique([email])
   @@map("user")
@@ -67,4 +74,31 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Providers {
+  id String @id
+  
+  openaiApiKey String?
+  openaiBaseUrl String @default("https://api.openai.com/v1")
+
+  anthropicApiKey String?
+  anthropicBaseUrl String @default("https://api.anthropic.com/v1")
+
+  googleGenApiKey String?
+  googleGenBaseUrl String @default("https://generativelanguage.googleapis.com/v1beta")
+
+  azureResourceName String?
+  azureApiKey String?
+
+  xApiKey String?
+  xBaseurl String @default("https://api.x.ai/v1")
+
+  deepseekApiKey String?
+  deepseekBaseUrl String @default("https://api.deepseek.com/v1")
+
+  perplexityApiKey String?
+  perplexityBaseUrl String @default("https://api.perplexity.ai")
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
 }

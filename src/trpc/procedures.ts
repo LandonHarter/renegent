@@ -15,3 +15,21 @@ export const authorizedProcedure = publicProcedure.use(
 		});
 	}
 );
+
+export const serverProcedure = publicProcedure.use(async ({ ctx, next }) => {
+	const renegentApiKey = ctx.renegentApiKey;
+	if (!renegentApiKey) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+		});
+	}
+	if (renegentApiKey !== process.env.RENEGENT_API_KEY) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+		});
+	}
+
+	return next({
+		ctx,
+	});
+});

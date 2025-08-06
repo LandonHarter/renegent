@@ -15,27 +15,38 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import {
-	BarChart2,
+	Blocks,
+	Book,
 	Box,
 	Braces,
 	Brain,
+	ChartBar,
+	ChartLine,
 	ChevronRight,
 	ChevronsUpDown,
-	Code,
+	CircleAlert,
+	Clipboard,
+	Clock,
 	CreditCard,
 	Database,
-	FileText,
-	GitPullRequest,
+	Folder,
+	Gamepad2,
+	History,
 	Home,
 	KeyRound,
+	Library,
 	LogOut,
-	PieChart,
+	Logs,
+	Package,
+	Pencil,
 	Plus,
-	Server,
-	ShoppingCart,
+	Search,
+	Settings,
 	Sparkles,
+	SquareKanban,
 	Store,
-	Webhook,
+	Text,
+	Unplug,
 	Wrench,
 } from "lucide-react";
 import Image from "next/image";
@@ -43,7 +54,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import SlideDown from "../animation/slide-down";
-import { User } from "@prisma/client";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -55,11 +65,13 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { authClient } from "@/auth/client";
+import { User } from "@prisma/client";
 
 type SidebarItem = {
 	title: string;
 	url: string;
 	icon: any;
+	target?: string;
 };
 
 type SidebarItemGroups = {
@@ -83,29 +95,45 @@ const GROUPS = [
 				icon: Home,
 				url: "/dashboard/home",
 			},
+			{
+				title: "Recent Activity",
+				icon: Clock,
+				url: "/dashboard/activity",
+			},
 		],
 	},
 	{
 		title: "AI",
 		items: [
 			{
-				title: "Models",
-				icon: Brain,
+				title: "Model Management",
+				icon: SquareKanban,
 				items: [
 					{
 						title: "My Models",
 						icon: Box,
-						url: "/dashboard/models",
+						url: "/dashboard/ai/models",
 					},
 					{
 						title: "Create Model",
 						icon: Plus,
-						url: "/dashboard/models/create",
+						url: "/dashboard/ai/models/create",
+					},
+				],
+			},
+			{
+				title: "Extensions",
+				icon: Blocks,
+				items: [
+					{
+						title: "My Extensions",
+						icon: Library,
+						url: "/dashboard/ai/library",
 					},
 					{
-						title: "Model Templates",
-						icon: FileText,
-						url: "/dashboard/models/templates",
+						title: "Create Extension",
+						icon: Plus,
+						url: "/dashboard/ai/extensions/create",
 					},
 				],
 			},
@@ -115,88 +143,167 @@ const GROUPS = [
 				items: [
 					{
 						title: "Model Marketplace",
-						icon: ShoppingCart,
-						url: "/dashboard/marketplace/models",
+						icon: Brain,
+						url: "/dashboard/ai/marketplace/models",
 					},
 					{
-						title: "Tool Marketplace",
-						icon: Wrench,
-						url: "/dashboard/marketplace/tools",
+						title: "Extension Marketplace",
+						icon: Blocks,
+						url: "/dashboard/ai/marketplace/extensions",
+					},
+					{
+						title: "Data Marketplace",
+						icon: Database,
+						url: "/dashboard/ai/marketplace/data",
+					},
+					{
+						title: "Prompt Marketplace",
+						icon: Pencil,
+						url: "/dashboard/ai/marketplace/prompts",
 					},
 				],
 			},
 		],
 	},
 	{
-		title: "Developers",
+		title: "Content and Data",
 		items: [
 			{
-				title: "Connection",
-				icon: GitPullRequest,
+				title: "Data Management",
+				icon: Database,
+				items: [
+					{
+						title: "Knowledge Bases",
+						icon: Folder,
+						url: "/dashboard/data/knowledge-bases",
+					},
+					{
+						title: "Data Sources",
+						icon: Text,
+						url: "/dashboard/data/sources",
+					},
+				],
+			},
+			{
+				title: "Prompts",
+				icon: Book,
+				items: [
+					{
+						title: "My Prompts",
+						icon: Pencil,
+						url: "/dashboard/data/prompts",
+					},
+					{
+						title: "Create Prompt",
+						icon: Plus,
+						url: "/dashboard/data/prompts/create",
+					},
+				],
+			},
+		],
+	},
+	{
+		title: "Developer",
+		items: [
+			{
+				title: "Integration",
+				icon: Braces,
 				items: [
 					{
 						title: "API Keys",
 						icon: KeyRound,
-						url: "/dashboard/developers/keys",
+						url: "/dashboard/developer/integration/keys",
 					},
 					{
-						title: "Endpoints",
-						icon: Server,
-						url: "/dashboard/developers/endpoints",
+						title: "Documentation",
+						icon: Book,
+						url: "https://docs.renegent.dev",
+						target: "_blank",
+					},
+					{
+						title: "SDKs",
+						icon: Package,
+						url: "/dashboard/developer/integration/sdks",
+					},
+					{
+						title: "Connect Providers",
+						icon: Unplug,
+						url: "/dashboard/developer/integration/providers",
 					},
 				],
 			},
 			{
-				title: "Integrations",
-				icon: Braces,
+				title: "Development Tools",
+				icon: Wrench,
 				items: [
 					{
-						title: "Webhooks",
-						icon: Webhook,
-						url: "/dashboard/developers/webhooks",
+						title: "Playground",
+						icon: Gamepad2,
+						url: "/dashboard/developer/tools/playground",
 					},
 					{
-						title: "SDKs",
-						icon: Code,
-						url: "/dashboard/developers/sdks",
+						title: "Request Inspector",
+						icon: Search,
+						url: "/dashboard/developer/tools/inspector",
+					},
+				],
+			},
+			{
+				title: "Logs and Monitoring",
+				icon: Clipboard,
+				items: [
+					{
+						title: "Logs",
+						icon: Logs,
+						url: "/dashboard/developer/logs",
 					},
 					{
-						title: "Dev Tools",
-						icon: Wrench,
-						url: "/dashboard/developers/devtools",
+						title: "Performance",
+						icon: ChartLine,
+						url: "/dashboard/developer/performance",
+					},
+					{
+						title: "Error Tracking",
+						icon: CircleAlert,
+						url: "/dashboard/developer/errors",
+					},
+					{
+						title: "Usage",
+						icon: ChartBar,
+						url: "/dashboard/developer/usage",
 					},
 				],
 			},
 		],
 	},
 	{
-		title: "Analytics",
+		title: "Account and Billing",
 		items: [
 			{
-				title: "Usage",
-				icon: BarChart2,
-				items: [
-					{
-						title: "Overview",
-						icon: PieChart,
-						url: "/dashboard/analytics",
-					},
-					{
-						title: "Storage",
-						icon: Database,
-						url: "/dashboard/analytics/storage",
-					},
-					{
-						title: "Tools",
-						icon: Wrench,
-						url: "/dashboard/analytics/tools",
-					},
-				],
+				title: "Settings",
+				icon: Settings,
+				url: "/dashboard/account/settings",
 			},
 			{
-				title: "Spending",
+				title: "Billing",
 				icon: CreditCard,
-				url: "/dashboard/analytics/spending",
+				items: [
+					{
+						title: "Subscription",
+						icon: Sparkles,
+						url: "/dashboard/account/billing/subscription",
+					},
+					{
+						title: "Billing History",
+						icon: History,
+						url: "/dashboard/account/billing/history",
+					},
+					{
+						title: "Cost Analytics",
+						icon: ChartBar,
+						url: "/dashboard/account/billing/analytics",
+					},
+				],
 			},
 		],
 	},
@@ -266,7 +373,7 @@ export default function DashboardSidebar({ user }: { user: User }) {
 				<Link href="/dashboard">
 					<Image
 						src="/brand/logo-transparent.png"
-						alt="Draftl Logo"
+						alt="Renegent Logo"
 						width={1024}
 						height={1024}
 						className="h-12 w-fit"
@@ -321,9 +428,12 @@ export default function DashboardSidebar({ user }: { user: User }) {
 																	isActive={isActive(
 																		subItem.url
 																	)}
-																	className="hover:bg-accent/50 transition-all duration-200"
+																	className="hover:bg-accent/50 whitespace-nowrap transition-all duration-200"
 																	href={
 																		subItem.url
+																	}
+																	target={
+																		subItem.target
 																	}
 																>
 																	<subItem.icon className="size-4" />

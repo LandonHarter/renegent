@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "@/lib/prisma";
 import { emailHarmony } from "better-auth-harmony";
 import { Resend } from "resend";
+import { createTrpcServer } from "@/trpc/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -37,6 +38,20 @@ export const auth = betterAuth({
 					${process.env.NEXT_PUBLIC_BASE_URL}/verify?token=${token}&email=${user.email}
 				`,
 			});
+		},
+	},
+	databaseHooks: {
+		user: {
+			create: {
+				after: async (user) => {
+					const trpcServer = await createTrpcServer(
+						process.env.RENEGENT_API_KEY
+					);
+					await trpcServer.auth.setupUser({
+						userId: user.id,
+					});
+				},
+			},
 		},
 	},
 	plugins: [emailHarmony()],

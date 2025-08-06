@@ -4,7 +4,7 @@ import { User } from "better-auth";
 import { headers } from "next/headers";
 import superjson from "superjson";
 
-export async function createTrpcContext() {
+export async function createTrpcContext(renegentApiKey?: string) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
@@ -12,6 +12,7 @@ export async function createTrpcContext() {
 	return {
 		user: session?.user as User | null,
 		signedIn: !!session?.user,
+		renegentApiKey,
 	};
 }
 
