@@ -1,10 +1,16 @@
 import DashboardTitle from "@/components/dashboard/title";
 import DashboardWrapper from "@/components/dashboard/wrapper";
 import { Button } from "@/components/ui/button";
+import { createTrpcServer } from "@/trpc/server";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { ModelsProvider } from "./_context/models-context";
+import ModelsPageContent from "./_components/models-page-content";
 
-export default function ModelsPage() {
+export default async function ModelsPage() {
+	const trpcServer = await createTrpcServer();
+	const models = await trpcServer.models.list();
+
 	return (
 		<DashboardWrapper>
 			<div className="flex items-center justify-between">
@@ -23,15 +29,9 @@ export default function ModelsPage() {
 				</Button>
 			</div>
 
-			{/* TODO: Add models list component here */}
-			<div className="rounded-lg border border-dashed p-8 text-center">
-				<p className="text-muted-foreground">
-					Models list coming soon...
-				</p>
-				<p className="text-muted-foreground mt-1 text-sm">
-					For now, you can create new models using the button above.
-				</p>
-			</div>
+			<ModelsProvider initialModels={models}>
+				<ModelsPageContent />
+			</ModelsProvider>
 		</DashboardWrapper>
 	);
 }
