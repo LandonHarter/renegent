@@ -56,7 +56,7 @@ export default function KeysTable({ keys }: { keys: ApiKey[] }) {
 									title="Click to copy"
 								>
 									<span className="text-gray-700">
-										{key.key || "N/A"}
+										ren-••••••••••••••••••••••••••••••••
 									</span>
 									{/* Copied confirmation tooltip */}
 									<span
