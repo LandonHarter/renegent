@@ -14,7 +14,7 @@ import {
 import { Bot, Settings2, Check } from "lucide-react";
 import { trpcClient } from "@/trpc/client";
 import { toast } from "sonner";
-import { PROVIDERS } from "@/data/models";
+import { ModelType, ProviderObject, PROVIDERS } from "@/data/models";
 import Image from "next/image";
 import { Provider, Model } from "@prisma/client";
 import Form, { SubmitButton } from "@/components/ui/form";
@@ -49,18 +49,21 @@ export default function ModelCreationForm({
 	const [modelName, setModelName] = useState("");
 	const [modelId, setModelId] = useState("");
 
-	const provider = PROVIDERS.find((p) => p.id === selectedProvider);
-	const availableModels = provider?.models || [];
+	const [provider, setProvider] = useState<ProviderObject | undefined>();
+	const [availableModels, setAvailableModels] = useState<ModelType[]>([]);
 
 	useEffect(() => {
 		if (selectedProvider) {
-			setSelectedProviderModel(provider?.models[0].id || "");
+			const p = PROVIDERS.find((p) => p.id === selectedProvider);
+			setProvider(p);
+			setAvailableModels(p?.models || []);
+			setSelectedProviderModel(p?.models[0].id || "");
 		}
 	}, [selectedProvider]);
 
 	const handleProviderSelect = (providerId: string) => {
 		setSelectedProvider(providerId);
-		setSelectedProviderModel("");
+		setSelectedProviderModel(provider?.models[0].id || "");
 		setModelId("");
 		setModelName("");
 	};
@@ -239,7 +242,10 @@ export default function ModelCreationForm({
 								</Label>
 								<Select
 									value={selectedProviderModel}
-									onValueChange={setSelectedProviderModel}
+									onValueChange={(e) => {
+										if (!e) return;
+										setSelectedProviderModel(e);
+									}}
 									disabled={!hasProviders}
 								>
 									<SelectTrigger className="h-12">

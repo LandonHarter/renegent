@@ -52,7 +52,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import SlideDown from "../animation/slide-down";
 import {
 	DropdownMenu,
@@ -66,6 +65,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { authClient } from "@/auth/client";
 import { User } from "@prisma/client";
+import { Skeleton } from "../ui/skeleton";
+import { useSidebarOpenSections } from "@/app/(pages)/(app)/dashboard/layout";
 
 type SidebarItem = {
 	title: string;
@@ -93,7 +94,7 @@ const GROUPS = [
 			{
 				title: "Home",
 				icon: Home,
-				url: "/dashboard/home",
+				url: "/dashboard",
 			},
 			{
 				title: "Recent Activity",
@@ -309,55 +310,15 @@ const GROUPS = [
 	},
 ] as SidebarGroup[];
 
-const SIDEBAR_STATE_KEY = "sidebar-open-sections";
+export default function DashboardSidebar() {
+	const { data: session, isPending } = authClient.useSession();
+	const user = session?.user as User;
 
-export default function DashboardSidebar({ user }: { user: User }) {
+	const { openSections, setOpenSections } = useSidebarOpenSections();
+
 	const pathname = usePathname();
-	const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-		{}
-	);
-	const [isHydrated, setIsHydrated] = useState(false);
 
 	const router = useRouter();
-
-	// Load saved state from localStorage on mount
-	useEffect(() => {
-		const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
-		if (savedState) {
-			try {
-				const parsedState = JSON.parse(savedState);
-				setOpenSections(parsedState);
-			} catch (error) {
-				console.warn("Failed to parse saved sidebar state:", error);
-			}
-		} else {
-			// Set intelligent defaults based on current route
-			const defaultState: Record<string, boolean> = {};
-			GROUPS.forEach((group) => {
-				group.items
-					.filter((item) => item.items)
-					.forEach((item) => {
-						// Open section if current page is within this section
-						const isCurrentSectionActive = item.items?.some(
-							(subItem) => pathname.startsWith(subItem.url)
-						);
-						defaultState[item.title] = isCurrentSectionActive!;
-					});
-			});
-			setOpenSections(defaultState);
-		}
-		setIsHydrated(true);
-	}, [pathname]);
-
-	// Save state to localStorage whenever it changes
-	useEffect(() => {
-		if (isHydrated) {
-			localStorage.setItem(
-				SIDEBAR_STATE_KEY,
-				JSON.stringify(openSections)
-			);
-		}
-	}, [openSections, isHydrated]);
 
 	const isActive = (url: string) => pathname === url;
 	const toggleSection = (sectionTitle: string) => {
@@ -370,7 +331,7 @@ export default function DashboardSidebar({ user }: { user: User }) {
 	return (
 		<Sidebar>
 			<SidebarHeader>
-				<Link href="/dashboard">
+				<Link href="/dashboard" passHref>
 					<Image
 						src="/brand/logo-transparent.png"
 						alt="Renegent Logo"
@@ -424,30 +385,37 @@ export default function DashboardSidebar({ user }: { user: User }) {
 																key={j + i + 1}
 																className="cursor-pointer"
 															>
-																<SidebarMenuSubButton
-																	isActive={isActive(
-																		subItem.url
-																	)}
-																	className="hover:bg-accent/50 whitespace-nowrap transition-all duration-200"
+																<Link
 																	href={
-																		subItem.url
+																		subItem.url!
 																	}
 																	target={
 																		subItem.target
 																	}
+																	passHref
 																>
-																	<subItem.icon
-																		className={`size-4 ${
-																			!isActive(
-																				subItem.url
-																			) &&
-																			"stroke-foreground"
-																		}`}
-																	/>
-																	{
-																		subItem.title
-																	}
-																</SidebarMenuSubButton>
+																	<SidebarMenuSubButton
+																		isActive={isActive(
+																			subItem.url
+																		)}
+																		className="hover:bg-accent/50 whitespace-nowrap transition-all duration-200"
+																		asChild
+																	>
+																		<div>
+																			<subItem.icon
+																				className={`size-4 ${
+																					!isActive(
+																						subItem.url
+																					) &&
+																					"stroke-foreground"
+																				}`}
+																			/>
+																			{
+																				subItem.title
+																			}
+																		</div>
+																	</SidebarMenuSubButton>
+																</Link>
 															</SidebarMenuSubItem>
 														)
 													)}
@@ -455,7 +423,7 @@ export default function DashboardSidebar({ user }: { user: User }) {
 											</SlideDown>
 										</>
 									) : (
-										<Link href={item.url!}>
+										<Link href={item.url!} passHref>
 											<SidebarMenuButton className="hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between transition-all duration-200">
 												<div className="flex items-center gap-2">
 													<item.icon className="size-4" />
@@ -475,42 +443,24 @@ export default function DashboardSidebar({ user }: { user: User }) {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<DropdownMenu>
-							<DropdownMenuTrigger
-								asChild
-								className="cursor-pointer transition-all duration-150"
-							>
-								<SidebarMenuButton
-									size="lg"
-									className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+						{isPending ? (
+							<div className="grid h-10 w-full grid-cols-[32px_auto] items-center gap-2 px-2">
+								<Skeleton className="h-8 w-8 rounded-lg" />
+								<div className="grid h-full grid-rows-2 gap-1">
+									<Skeleton className="h-full w-full" />
+									<Skeleton className="h-full w-full" />
+								</div>
+							</div>
+						) : (
+							<DropdownMenu>
+								<DropdownMenuTrigger
+									asChild
+									className="cursor-pointer transition-all duration-150"
 								>
-									<Avatar className="h-8 w-8 rounded-lg">
-										<AvatarImage
-											src={user.image!}
-											alt={user.name}
-										/>
-										<AvatarFallback className="rounded-lg">
-											{user.name?.charAt(0)}
-										</AvatarFallback>
-									</Avatar>
-									<div className="grid flex-1 text-left text-sm leading-tight">
-										<span className="truncate font-medium">
-											{user.name}
-										</span>
-										<span className="truncate text-xs">
-											{user.email}
-										</span>
-									</div>
-									<ChevronsUpDown className="ml-auto size-4" />
-								</SidebarMenuButton>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-								align="end"
-								sideOffset={4}
-							>
-								<DropdownMenuLabel className="p-0 font-normal">
-									<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+									<SidebarMenuButton
+										size="lg"
+										className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+									>
 										<Avatar className="h-8 w-8 rounded-lg">
 											<AvatarImage
 												src={user.image!}
@@ -528,30 +478,58 @@ export default function DashboardSidebar({ user }: { user: User }) {
 												{user.email}
 											</span>
 										</div>
-									</div>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuItem>
-										<Sparkles />
-										Upgrade to Pro
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuItem
-										variant="destructive"
-										onClick={async () => {
-											await authClient.signOut();
-											router.push("/");
-										}}
-									>
-										<LogOut />
-										Log Out
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+										<ChevronsUpDown className="ml-auto size-4" />
+									</SidebarMenuButton>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+									align="end"
+									sideOffset={4}
+								>
+									<DropdownMenuLabel className="p-0 font-normal">
+										<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+											<Avatar className="h-8 w-8 rounded-lg">
+												<AvatarImage
+													src={user.image!}
+													alt={user.name}
+												/>
+												<AvatarFallback className="rounded-lg">
+													{user.name?.charAt(0)}
+												</AvatarFallback>
+											</Avatar>
+											<div className="grid flex-1 text-left text-sm leading-tight">
+												<span className="truncate font-medium">
+													{user.name}
+												</span>
+												<span className="truncate text-xs">
+													{user.email}
+												</span>
+											</div>
+										</div>
+									</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuItem>
+											<Sparkles />
+											Upgrade to Pro
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuItem
+											variant="destructive"
+											onClick={async () => {
+												await authClient.signOut();
+												router.push("/");
+											}}
+										>
+											<LogOut />
+											Log Out
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>

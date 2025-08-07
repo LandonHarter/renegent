@@ -1,20 +1,42 @@
+"use client";
+
 import DashboardHeader from "@/components/dashboard/header";
 import DashboardSidebar from "@/components/dashboard/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { useAuthState } from "@/hooks/use-auth-state";
 import Image from "next/image";
+import { createContext, useContext, useState } from "react";
 
-export default async function DashboardLayout({
+const SidebarOpenSectionsContext = createContext<{
+	openSections: Record<string, boolean>;
+	setOpenSections: React.Dispatch<
+		React.SetStateAction<Record<string, boolean>>
+	>;
+}>({
+	openSections: {},
+	setOpenSections: () => {},
+});
+
+export function useSidebarOpenSections() {
+	return useContext(SidebarOpenSectionsContext);
+}
+
+export default function DashboardLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const { user } = await useAuthState();
+	const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+		{}
+	);
 
 	return (
 		<div className="relative">
 			<SidebarProvider className="absolute max-lg:hidden">
-				<DashboardSidebar user={user!} />
+				<SidebarOpenSectionsContext.Provider
+					value={{ openSections, setOpenSections }}
+				>
+					<DashboardSidebar />
+				</SidebarOpenSectionsContext.Provider>
 				<div className="flex w-full flex-col overflow-x-hidden">
 					<DashboardHeader />
 					<main className="w-full px-4 py-2 pt-3">{children}</main>

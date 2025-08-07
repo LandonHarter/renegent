@@ -1,3 +1,16 @@
+export type ProviderObject = {
+	id: string;
+	name: string;
+	icon: string;
+	models: ModelType[];
+};
+
+export type ModelType = {
+	id: string;
+	name: string;
+	description?: string;
+};
+
 export const PROVIDERS = [
 	{
 		id: "openai",
@@ -7,6 +20,10 @@ export const PROVIDERS = [
 			{
 				id: "gpt-4o",
 				name: "GPT-4o",
+			},
+			{
+				id: "gpt-4o-mini",
+				name: "GPT-4o Mini",
 			},
 		],
 	},
@@ -76,13 +93,4 @@ export const PROVIDERS = [
 			},
 		],
 	},
-] as {
-	id: string;
-	name: string;
-	icon: string;
-	models: {
-		id: string;
-		name: string;
-		description?: string;
-	}[];
-}[];
+] as ProviderObject[];
