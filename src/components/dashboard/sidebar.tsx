@@ -436,7 +436,14 @@ export default function DashboardSidebar({ user }: { user: User }) {
 																		subItem.target
 																	}
 																>
-																	<subItem.icon className="size-4" />
+																	<subItem.icon
+																		className={`size-4 ${
+																			!isActive(
+																				subItem.url
+																			) &&
+																			"stroke-foreground"
+																		}`}
+																	/>
 																	{
 																		subItem.title
 																	}

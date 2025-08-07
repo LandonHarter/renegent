@@ -30,16 +30,6 @@ export const providersRouter = router({
 		});
 		return providers;
 	}),
-	checkOpenAIKey: authorizedProcedure
-		.input(z.string())
-		.mutation(async ({ input }) => {
-			const res = await fetch("https://api.openai.com/v1/models", {
-				headers: {
-					Authorization: `Bearer ${input}`,
-				},
-			});
-			return res.ok;
-		}),
 	updateKeys: authorizedProcedure
 		.input(ProvidersUpdateSchema)
 		.mutation(async ({ ctx, input }) => {

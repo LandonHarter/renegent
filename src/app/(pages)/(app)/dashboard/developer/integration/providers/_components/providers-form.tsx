@@ -14,6 +14,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { trpcClient } from "@/trpc/client";
 import { toast } from "sonner";
 import Image from "next/image";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ProviderConfig {
 	id: string;
@@ -169,6 +174,7 @@ interface ProvidersFormProps {
 
 export default function ProvidersForm({ initialData }: ProvidersFormProps) {
 	const [formData, setFormData] = useState<Record<string, string>>({});
+	const [invalidProviders, setInvalidProviders] = useState<string[]>([]);
 	const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>(
 		{}
 	);
@@ -282,7 +288,24 @@ export default function ProvidersForm({ initialData }: ProvidersFormProps) {
 									(field) => !formData[field.key]
 								) && (
 									<div className="mr-4 ml-auto">
-										<div className="h-2 w-2 rounded-full bg-green-500" />
+										<Tooltip>
+											<TooltipTrigger asChild>
+												{invalidProviders.includes(
+													provider.id
+												) ? (
+													<div className="h-2 w-2 rounded-full bg-red-500" />
+												) : (
+													<div className="h-2 w-2 rounded-full bg-green-500" />
+												)}
+											</TooltipTrigger>
+											<TooltipContent>
+												{invalidProviders.includes(
+													provider.id
+												)
+													? "Invalid configuration"
+													: "Enabled"}
+											</TooltipContent>
+										</Tooltip>
 									</div>
 								)}
 							</div>

@@ -27,6 +27,7 @@ model User {
 
   apiKeys ApiKey[]
   providers Providers?
+  models Model[]
 
   @@unique([email])
   @@map("user")
@@ -77,6 +78,16 @@ model Verification {
   @@map("verification")
 }
 
+enum Provider {
+  OPENAI
+  ANTHROPIC
+  GOOGLE_GEN
+  AZURE
+  X
+  DEEPSEEK
+  PERPLEXITY
+}
+
 model Providers {
   id String @id
   
@@ -115,6 +126,22 @@ model ApiKey {
   name String
   createdAt DateTime @default(now())
   lastUsed DateTime?
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Model {
+  id String @id @default(uuid())
+
+  name String
+  modelId String
+
+  provider Provider
+  providerModelId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
