@@ -32,6 +32,21 @@ export const LINKS: Links[] = [
 		],
 	},
 	{
+		href: "/dashboard/ai/model/*",
+		items: [
+			{
+				title: "AI",
+			},
+			{
+				title: "Models",
+				href: "/dashboard/ai/models",
+			},
+			{
+				title: "Edit Model",
+			},
+		],
+	},
+	{
 		href: "/dashboard/ai/models",
 		items: [
 			{
@@ -97,7 +112,11 @@ export default function DashboardHeader() {
 
 	useEffect(() => {
 		setBreadcrumbLinks(
-			LINKS.find((link) => link.href.includes(pathname)) || null
+			LINKS.find((link) =>
+				link.href.includes("*")
+					? pathname.startsWith(link.href.replace("*", ""))
+					: link.href.includes(pathname)
+			) || null
 		);
 	}, [pathname]);
 

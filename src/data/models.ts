@@ -94,3 +94,7 @@ export const PROVIDERS = [
 		],
 	},
 ] as ProviderObject[];
+
+export function getProvider(id: string) {
+	return PROVIDERS.find((provider) => provider.id === id.toLowerCase());
+}

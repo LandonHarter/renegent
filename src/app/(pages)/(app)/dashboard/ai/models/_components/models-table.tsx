@@ -12,12 +12,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { PROVIDERS } from "@/data/models";
+import { useRouter } from "next/navigation";
 
 interface ModelsTableProps {
 	models: Model[];
 }
 
 export default function ModelsTable({ models }: ModelsTableProps) {
+	const router = useRouter();
+
 	const formatDate = (date: Date) => {
 		return new Date(date).toLocaleDateString("en-US", {
 			year: "numeric",
@@ -57,7 +60,15 @@ export default function ModelsTable({ models }: ModelsTableProps) {
 						);
 
 						return (
-							<TableRow key={model.id}>
+							<TableRow
+								key={model.id}
+								className="hover:bg-accent/50 cursor-pointer"
+								onClick={() =>
+									router.push(
+										`/dashboard/ai/model/${model.id}`
+									)
+								}
+							>
 								<TableCell>
 									<div className="flex items-center gap-3">
 										{provider && (

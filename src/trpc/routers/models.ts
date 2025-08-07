@@ -58,22 +58,20 @@ export const modelsRouter = router({
 
 		return models;
 	}),
-	get: authorizedProcedure
-		.input(z.object({ id: z.string() }))
-		.query(async ({ ctx, input }) => {
-			const model = await prisma.model.findFirst({
-				where: {
-					id: input.id,
-					userId: ctx.user?.id!,
-				},
-			});
+	get: authorizedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+		const model = await prisma.model.findFirst({
+			where: {
+				id: input,
+				userId: ctx.user?.id!,
+			},
+		});
 
-			if (!model) {
-				throw new Error("Model not found");
-			}
+		if (!model) {
+			throw new Error("Model not found");
+		}
 
-			return model;
-		}),
+		return model;
+	}),
 
 	delete: authorizedProcedure
 		.input(z.object({ id: z.string() }))
