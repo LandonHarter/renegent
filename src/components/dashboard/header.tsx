@@ -12,6 +12,7 @@ import {
 import { Separator } from "../ui/separator";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Fragment, useEffect, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 type Links = {
 	href: string;
@@ -104,6 +105,49 @@ export const LINKS: Links[] = [
 			},
 		],
 	},
+	{
+		href: "/dashboard/data/prompts",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Prompts",
+				href: "/dashboard/data/prompts",
+			},
+		],
+	},
+	{
+		href: "/dashboard/data/prompts/create",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Prompts",
+				href: "/dashboard/data/prompts",
+			},
+			{
+				title: "Create",
+				href: "/dashboard/data/prompts/create",
+			},
+		],
+	},
+	{
+		href: "/dashboard/data/prompt/*",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Prompts",
+				href: "/dashboard/data/prompts",
+			},
+			{
+				title: "Edit Prompt",
+			},
+		],
+	},
 ];
 
 export default function DashboardHeader() {
@@ -158,6 +202,15 @@ export default function DashboardHeader() {
 								)}
 							</Fragment>
 						))}
+						{!breadcrumbLinks && (
+							<>
+								<Skeleton className="h-4 w-24" />
+								<BreadcrumbSeparator className="hidden md:block" />
+								<Skeleton className="h-4 w-24" />
+								<BreadcrumbSeparator className="hidden md:block" />
+								<Skeleton className="h-4 w-24" />
+							</>
+						)}
 					</BreadcrumbList>
 				</Breadcrumb>
 			</div>

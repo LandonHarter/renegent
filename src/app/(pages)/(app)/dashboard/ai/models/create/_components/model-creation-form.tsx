@@ -118,7 +118,7 @@ export default function ModelCreationForm({
 				description: `${name} is now available for use.`,
 			});
 
-			router.push("/dashboard/ai/models");
+			router.push(`/dashboard/ai/model/${modelId}`);
 		} catch (error: any) {
 			toast.error("Failed to create model", {
 				description: error?.message || "An unexpected error occurred",
@@ -213,8 +213,8 @@ export default function ModelCreationForm({
 										className={cn(
 											"hover:bg-muted/50 flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors",
 											selectedProvider === provider.id
-												? "bg-muted border-primary"
-												: "bg-background",
+												? "bg-card border-primary"
+												: "bg-card",
 											!hasProviders &&
 												"cursor-not-allowed opacity-50"
 										)}
@@ -248,7 +248,7 @@ export default function ModelCreationForm({
 									}}
 									disabled={!hasProviders}
 								>
-									<SelectTrigger className="h-12">
+									<SelectTrigger className="bg-card h-12">
 										<SelectValue>
 											{selectedProviderModel ? (
 												<div className="flex flex-col items-start">
@@ -299,7 +299,7 @@ export default function ModelCreationForm({
 
 						{/* Preview Card */}
 						{selectedProvider && (
-							<div className="bg-muted/30 space-y-2 rounded-lg border p-4">
+							<div className="bg-card space-y-2 rounded-lg border p-4">
 								<div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
 									<Check className="h-4 w-4" />
 									Preview

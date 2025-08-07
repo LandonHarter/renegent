@@ -9,11 +9,13 @@ import { Button, buttonVariants } from "../ui/button";
 
 export default function Form({
 	action,
+	submitOnEnter = true,
 	children,
 	className,
 	...props
 }: {
 	action: (data: FormData) => Promise<void>;
+	submitOnEnter?: boolean;
 	children: (
 		ref: RefObject<HTMLFormElement | null>,
 		loading: boolean,
@@ -34,7 +36,7 @@ export default function Form({
 			}}
 			className={className}
 			onKeyDown={(e) => {
-				if (e.key === "Enter" && !loading) {
+				if (e.key === "Enter" && !loading && submitOnEnter) {
 					e.preventDefault();
 					setLoading(true);
 					ref.current?.requestSubmit();

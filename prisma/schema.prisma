@@ -28,6 +28,7 @@ model User {
   apiKeys ApiKey[]
   providers Providers?
   models Model[]
+  prompts Prompt[]
 
   @@unique([email])
   @@map("user")
@@ -142,6 +143,26 @@ model Model {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  prompts Prompt[]
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Prompt {
+  id String @id @default(uuid())
+  promptId String
+
+  name String
+  prompt String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variables String[] @default([])
+
+  models Model[]
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
