@@ -15,6 +15,7 @@ const ModelCreateSchema = z.object({
 		.max(100, "Model ID must be less than 100 characters"),
 	provider: z.nativeEnum(Provider),
 	providerModelId: z.string().min(1, "Provider model ID is required"),
+	knowledgeBaseIds: z.array(z.string()).optional().default([]),
 });
 
 export const modelsRouter = router({
@@ -40,6 +41,9 @@ export const modelsRouter = router({
 					provider: input.provider,
 					providerModelId: input.providerModelId,
 					userId: ctx.user?.id!,
+					knowledgeBases: {
+						connect: input.knowledgeBaseIds.map((id) => ({ id })),
+					},
 				},
 			});
 
@@ -63,6 +67,9 @@ export const modelsRouter = router({
 			where: {
 				id: input,
 				userId: ctx.user?.id!,
+			},
+			include: {
+				knowledgeBases: true,
 			},
 		});
 

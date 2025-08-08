@@ -11,6 +11,8 @@ export default async function CreateModelPage() {
 	const hasProviders = hasConfiguredProviders(providers);
 	const models = await trpcServer.models.list();
 
+	const knowledgeBases = await trpcServer.knowledgeBases.list();
+
 	return (
 		<DashboardWrapper>
 			<DashboardTitle
@@ -29,6 +31,7 @@ export default async function CreateModelPage() {
 			<ModelCreationForm
 				hasProviders={hasProviders}
 				existingModels={models}
+				knowledgeBases={knowledgeBases}
 			/>
 		</DashboardWrapper>
 	);

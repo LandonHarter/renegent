@@ -11,14 +11,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Bot, Settings2, Check } from "lucide-react";
+import { Bot, Settings2, Check, Database, BookOpen } from "lucide-react";
 import { trpcClient } from "@/trpc/client";
 import { toast } from "sonner";
 import { ModelType, ProviderObject, PROVIDERS } from "@/data/models";
 import Image from "next/image";
-import { Provider, Model } from "@prisma/client";
+import { Provider, Model, KnowledgeBase } from "@prisma/client";
 import Form, { SubmitButton } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Map frontend provider IDs to backend enum values
 const PROVIDER_MAPPING: Record<string, Provider> = {
@@ -35,12 +36,14 @@ interface ModelCreationFormProps {
 	className?: string;
 	hasProviders?: boolean;
 	existingModels?: Model[];
+	knowledgeBases?: KnowledgeBase[];
 }
 
 export default function ModelCreationForm({
 	className = "",
 	hasProviders = true,
 	existingModels = [],
+	knowledgeBases = [],
 }: ModelCreationFormProps) {
 	const router = useRouter();
 	const [selectedProvider, setSelectedProvider] = useState("");
@@ -48,6 +51,9 @@ export default function ModelCreationForm({
 	const [modelIdError, setModelIdError] = useState("");
 	const [modelName, setModelName] = useState("");
 	const [modelId, setModelId] = useState("");
+	const [selectedKnowledgeBases, setSelectedKnowledgeBases] = useState<
+		string[]
+	>([]);
 
 	const [provider, setProvider] = useState<ProviderObject | undefined>();
 	const [availableModels, setAvailableModels] = useState<ModelType[]>([]);
@@ -93,6 +99,14 @@ export default function ModelCreationForm({
 		return true;
 	};
 
+	const toggleKnowledgeBase = (knowledgeBaseId: string) => {
+		setSelectedKnowledgeBases((prev) =>
+			prev.includes(knowledgeBaseId)
+				? prev.filter((id) => id !== knowledgeBaseId)
+				: [...prev, knowledgeBaseId]
+		);
+	};
+
 	const handleFormSubmit = async (formData: FormData) => {
 		const name = formData.get("name") as string;
 		const modelId = formData.get("modelId") as string;
@@ -114,18 +128,19 @@ export default function ModelCreationForm({
 				throw new Error("Invalid provider selected");
 			}
 
-			await trpcClient.models.create.mutate({
+			const model = await trpcClient.models.create.mutate({
 				name,
 				modelId,
 				provider: backendProvider,
 				providerModelId: selectedProviderModel,
+				knowledgeBaseIds: selectedKnowledgeBases,
 			});
 
 			toast.success("Model created successfully!", {
 				description: `${name} is now available for use.`,
 			});
 
-			router.push(`/dashboard/ai/model/${modelId}`);
+			router.push(`/dashboard/ai/model/${model.id}`);
 		} catch (error: any) {
 			toast.error("Failed to create model", {
 				description: error?.message || "An unexpected error occurred",
@@ -326,6 +341,81 @@ export default function ModelCreationForm({
 							</div>
 						)}
 
+						{/* Knowledge Base Selection */}
+						<div className="space-y-2">
+							<Label className="flex items-center gap-2 text-sm font-medium">
+								<BookOpen className="h-4 w-4" />
+								Knowledge Bases (Optional)
+							</Label>
+
+							{knowledgeBases.length === 0 ? (
+								<Card className="border-dashed">
+									<CardContent className="flex flex-col items-center justify-center py-6">
+										<BookOpen className="text-muted-foreground mb-2 h-6 w-6" />
+										<p className="text-muted-foreground text-center text-sm">
+											No knowledge bases available.
+											<br />
+											<a
+												href="/dashboard/data/knowledge-bases/create"
+												className="text-primary hover:underline"
+											>
+												Create a knowledge base first
+											</a>
+										</p>
+									</CardContent>
+								</Card>
+							) : (
+								<div className="grid gap-3 md:grid-cols-2">
+									{knowledgeBases.map((knowledgeBase) => (
+										<button
+											key={knowledgeBase.id}
+											type="button"
+											onClick={() =>
+												toggleKnowledgeBase(
+													knowledgeBase.id
+												)
+											}
+											disabled={!hasProviders}
+											className={cn(
+												"hover:bg-muted/50 relative flex cursor-pointer flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",
+												selectedKnowledgeBases.includes(
+													knowledgeBase.id
+												)
+													? "bg-card border-primary"
+													: "bg-card",
+												!hasProviders &&
+													"cursor-not-allowed opacity-50"
+											)}
+										>
+											{selectedKnowledgeBases.includes(
+												knowledgeBase.id
+											) && (
+												<div className="absolute top-2 right-2">
+													<Check className="text-primary h-4 w-4" />
+												</div>
+											)}
+											<div className="flex items-center gap-2">
+												<Database className="text-muted-foreground h-4 w-4" />
+												<span className="text-sm font-medium">
+													{knowledgeBase.name}
+												</span>
+											</div>
+											<p className="text-muted-foreground text-xs">
+												Created{" "}
+												{new Date(
+													knowledgeBase.createdAt
+												).toLocaleDateString()}
+											</p>
+										</button>
+									))}
+								</div>
+							)}
+							<p className="text-muted-foreground text-xs">
+								Attach knowledge bases to provide context for
+								this AI model
+							</p>
+						</div>
+
 						{/* Preview Card */}
 						{selectedProvider && (
 							<div className="bg-card space-y-2 rounded-lg border p-4">
@@ -333,25 +423,54 @@ export default function ModelCreationForm({
 									<Check className="h-4 w-4" />
 									Preview
 								</div>
-								<div className="flex items-center gap-3">
-									{provider && (
-										<Image
-											src={provider.icon}
-											alt={provider.name}
-											width={32}
-											height={32}
-											className="rounded"
-										/>
-									)}
-									<div>
-										<p className="font-medium">
-											{modelName || "Set a name..."}
-										</p>
-										<p className="text-muted-foreground font-mono text-sm">
-											{selectedProviderModel ||
-												"Select a model"}
-										</p>
+								<div className="space-y-3">
+									<div className="flex items-center gap-3">
+										{provider && (
+											<Image
+												src={provider.icon}
+												alt={provider.name}
+												width={32}
+												height={32}
+												className="rounded"
+											/>
+										)}
+										<div>
+											<p className="font-medium">
+												{modelName || "Set a name..."}
+											</p>
+											<p className="text-muted-foreground font-mono text-sm">
+												{selectedProviderModel ||
+													"Select a model"}
+											</p>
+										</div>
 									</div>
+									{selectedKnowledgeBases.length > 0 && (
+										<div className="space-y-2">
+											<p className="text-muted-foreground text-sm font-medium">
+												Knowledge Bases (
+												{selectedKnowledgeBases.length})
+											</p>
+											<div className="flex flex-wrap gap-1">
+												{selectedKnowledgeBases.map(
+													(id) => {
+														const kb =
+															knowledgeBases.find(
+																(kb) =>
+																	kb.id === id
+															);
+														return kb ? (
+															<span
+																key={id}
+																className="bg-muted rounded px-2 py-1 text-xs"
+															>
+																{kb.name}
+															</span>
+														) : null;
+													}
+												)}
+											</div>
+										</div>
+									)}
 								</div>
 							</div>
 						)}
