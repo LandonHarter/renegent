@@ -61,7 +61,7 @@ export const modelsRouter = router({
 	get: authorizedProcedure.input(z.string()).query(async ({ ctx, input }) => {
 		const model = await prisma.model.findFirst({
 			where: {
-				modelId: input,
+				id: input,
 				userId: ctx.user?.id!,
 			},
 		});

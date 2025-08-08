@@ -6,6 +6,7 @@ import { router } from "./trpc";
 import { promptsRouter } from "./routers/prompts";
 import { dataRouter } from "./routers/data";
 import { vectorRouter } from "./routers/vector";
+import { knowledgeBasesRouter } from "./routers/knowledge";
 
 export const appRouter = router({
 	auth: authRouter,
@@ -15,5 +16,6 @@ export const appRouter = router({
 	prompts: promptsRouter,
 	data: dataRouter,
 	vector: vectorRouter,
+	knowledgeBases: knowledgeBasesRouter,
 });
 export type AppRouter = typeof appRouter;

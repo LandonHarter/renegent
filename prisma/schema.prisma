@@ -30,6 +30,7 @@ model User {
   models Model[]
   prompts Prompt[]
   dataSources DataSource[]
+  knowledgeBases KnowledgeBase[]
 
   @@unique([email])
   @@map("user")
@@ -114,8 +115,6 @@ model Providers {
   perplexityApiKey String?
   perplexityBaseUrl String @default("https://api.perplexity.ai")
 
-  
-
   user User @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
@@ -146,7 +145,8 @@ model Model {
   updatedAt DateTime @updatedAt
 
   prompts Prompt[]
-
+  knowledgeBases KnowledgeBase[]
+  
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -178,6 +178,7 @@ model DataSource {
   createdAt DateTime @default(now())
 
   fragments DataFragments[]
+  knowledgeBases KnowledgeBase[]
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -193,4 +194,19 @@ model DataFragments {
   dataSource DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
 
   @@map("data_fragments")
+}
+
+model KnowledgeBase {
+  id String @id @default(uuid())
+
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dataSources DataSource[]
+  models Model[]
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

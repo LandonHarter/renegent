@@ -191,6 +191,34 @@ export const LINKS: Links[] = [
 			},
 		],
 	},
+	{
+		href: "/dashboard/data/knowledge-bases",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Knowledge Bases",
+				href: "/dashboard/data/knowledge-bases",
+			},
+		],
+	},
+	{
+		href: "/dashboard/data/knowledge-bases/create",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Knowledge Bases",
+				href: "/dashboard/data/knowledge-bases",
+			},
+			{
+				title: "Create",
+				href: "/dashboard/data/knowledge-bases/create",
+			},
+		],
+	},
 ];
 
 export default function DashboardHeader() {
