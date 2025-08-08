@@ -148,6 +148,49 @@ export const LINKS: Links[] = [
 			},
 		],
 	},
+	{
+		href: "/dashboard/data/sources",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Sources",
+				href: "/dashboard/data/sources",
+			},
+		],
+	},
+	{
+		href: "/dashboard/data/sources/create",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Sources",
+				href: "/dashboard/data/sources",
+			},
+			{
+				title: "Create",
+				href: "/dashboard/data/sources/create",
+			},
+		],
+	},
+	{
+		href: "/dashboard/data/sources/*",
+		items: [
+			{
+				title: "Data",
+			},
+			{
+				title: "Sources",
+				href: "/dashboard/data/sources",
+			},
+			{
+				title: "Edit",
+			},
+		],
+	},
 ];
 
 export default function DashboardHeader() {

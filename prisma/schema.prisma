@@ -29,6 +29,7 @@ model User {
   providers Providers?
   models Model[]
   prompts Prompt[]
+  dataSources DataSource[]
 
   @@unique([email])
   @@map("user")
@@ -166,4 +167,30 @@ model Prompt {
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DataSource {
+  id String @id @default(uuid())
+
+  name String
+  description String
+
+  createdAt DateTime @default(now())
+
+  fragments DataFragments[]
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DataFragments {
+  id String @id @default(uuid())
+
+  content String
+  embedding Unsupported("vector")
+
+  dataSourceId String
+  dataSource DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+
+  @@map("data_fragments")
 }
