@@ -57,13 +57,20 @@ export default function ModelCreationForm({
 			const p = PROVIDERS.find((p) => p.id === selectedProvider);
 			setProvider(p);
 			setAvailableModels(p?.models || []);
-			setSelectedProviderModel(p?.models[0].id || "");
+			setSelectedProviderModel(
+				selectedProvider === "azure" ? "" : p?.models?.[0]?.id || ""
+			);
 		}
 	}, [selectedProvider]);
 
 	const handleProviderSelect = (providerId: string) => {
 		setSelectedProvider(providerId);
-		setSelectedProviderModel(provider?.models[0].id || "");
+		if (providerId === "azure") {
+			setSelectedProviderModel("");
+		} else {
+			const p = PROVIDERS.find((p) => p.id === providerId);
+			setSelectedProviderModel(p?.models?.[0]?.id || "");
+		}
 		setModelId("");
 		setModelName("");
 	};
@@ -235,7 +242,7 @@ export default function ModelCreationForm({
 						</div>
 
 						{/* Provider Model Selection */}
-						{selectedProvider && (
+						{selectedProvider && selectedProvider !== "azure" && (
 							<div className="space-y-2">
 								<Label className="text-sm font-medium">
 									Provider Model
@@ -293,6 +300,28 @@ export default function ModelCreationForm({
 								<p className="text-muted-foreground text-xs">
 									The actual model from {provider?.name} that
 									will be used
+								</p>
+							</div>
+						)}
+						{selectedProvider === "azure" && (
+							<div className="space-y-2">
+								<Label className="text-sm font-medium">
+									Provider Model
+								</Label>
+								<Input
+									placeholder="Enter your Azure deployment/model ID"
+									className="h-11 font-mono"
+									value={selectedProviderModel}
+									onChange={(e) =>
+										setSelectedProviderModel(
+											e.target.value.trim()
+										)
+									}
+									disabled={!hasProviders}
+								/>
+								<p className="text-muted-foreground text-xs">
+									Enter the deployment name you configured in
+									the Azure portal
 								</p>
 							</div>
 						)}
