@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Database, BookOpen, Check } from "lucide-react";
+import { Database, BookOpen, Check, Pencil } from "lucide-react";
 import { trpcClient } from "@/trpc/client";
 import { toast } from "sonner";
 import Form, { SubmitButton } from "@/components/ui/form";
@@ -23,6 +23,7 @@ export default function KnowledgeBaseCreationForm({
 }: KnowledgeBaseCreationFormProps) {
 	const router = useRouter();
 	const [name, setName] = useState("");
+	const [description, setDescription] = useState("");
 	const [selectedDataSources, setSelectedDataSources] = useState<string[]>(
 		[]
 	);
@@ -37,9 +38,9 @@ export default function KnowledgeBaseCreationForm({
 
 	const handleFormSubmit = async (formData: FormData) => {
 		const name = formData.get("name") as string;
-
-		if (!name) {
-			toast.error("Please enter a knowledge base name");
+		const description = formData.get("description") as string;
+		if (!name || !description) {
+			toast.error("Please enter a knowledge base name and description");
 			return;
 		}
 
@@ -52,6 +53,7 @@ export default function KnowledgeBaseCreationForm({
 			const knowledgeBase = await trpcClient.knowledgeBases.create.mutate(
 				{
 					name,
+					description,
 					dataSourceIds: selectedDataSources,
 				}
 			);
@@ -96,6 +98,29 @@ export default function KnowledgeBaseCreationForm({
 							<p className="text-muted-foreground text-xs">
 								A descriptive name to identify your knowledge
 								base
+							</p>
+						</div>
+
+						<div className="space-y-2">
+							<Label
+								htmlFor="description"
+								className="flex items-center gap-2 text-sm font-medium"
+							>
+								<Pencil className="h-4 w-4" />
+								Knowledge Base Description
+							</Label>
+							<Input
+								id="description"
+								name="description"
+								placeholder="e.g., This knowledge base contains product documentation, API references, and other relevant information about Renegent."
+								className="h-11"
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+							/>
+							<p className="text-muted-foreground text-xs">
+								Describe your data source so the AI knows when
+								to fetch from it and how to use it (this is
+								actually important).
 							</p>
 						</div>
 

@@ -15,6 +15,7 @@ export const knowledgeBasesRouter = router({
 		.input(
 			z.object({
 				name: z.string(),
+				description: z.string(),
 				dataSourceIds: z.array(z.string()),
 			})
 		)
@@ -22,6 +23,7 @@ export const knowledgeBasesRouter = router({
 			return await prisma.knowledgeBase.create({
 				data: {
 					name: input.name,
+					description: input.description,
 					userId: ctx.user?.id!,
 					dataSources: {
 						connect: input.dataSourceIds.map((id) => ({ id })),
