@@ -15,11 +15,9 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import {
-	Blocks,
 	Book,
 	Box,
 	Braces,
-	Brain,
 	ChartBar,
 	ChartLine,
 	ChevronRight,
@@ -27,24 +25,19 @@ import {
 	CircleAlert,
 	Clipboard,
 	Clock,
-	CreditCard,
 	Database,
 	Folder,
 	Gamepad2,
-	History,
 	Home,
 	KeyRound,
-	Library,
 	LogOut,
 	Logs,
-	Package,
 	Pencil,
 	Plus,
 	Search,
 	Settings,
 	Sparkles,
 	SquareKanban,
-	Store,
 	Text,
 	Unplug,
 	Wrench,
@@ -122,48 +115,6 @@ const GROUPS = [
 					},
 				],
 			},
-			{
-				title: "Extensions",
-				icon: Blocks,
-				items: [
-					{
-						title: "My Extensions",
-						icon: Library,
-						url: "/dashboard/ai/library",
-					},
-					{
-						title: "Create Extension",
-						icon: Plus,
-						url: "/dashboard/ai/extensions/create",
-					},
-				],
-			},
-			{
-				title: "Marketplace",
-				icon: Store,
-				items: [
-					{
-						title: "Model Marketplace",
-						icon: Brain,
-						url: "/dashboard/ai/marketplace/models",
-					},
-					{
-						title: "Extension Marketplace",
-						icon: Blocks,
-						url: "/dashboard/ai/marketplace/extensions",
-					},
-					{
-						title: "Data Marketplace",
-						icon: Database,
-						url: "/dashboard/ai/marketplace/data",
-					},
-					{
-						title: "Prompt Marketplace",
-						icon: Pencil,
-						url: "/dashboard/ai/marketplace/prompts",
-					},
-				],
-			},
 		],
 	},
 	{
@@ -214,17 +165,6 @@ const GROUPS = [
 						title: "API Keys",
 						icon: KeyRound,
 						url: "/dashboard/developer/integration/keys",
-					},
-					{
-						title: "Documentation",
-						icon: Book,
-						url: "https://docs.renegent.dev",
-						target: "_blank",
-					},
-					{
-						title: "SDKs",
-						icon: Package,
-						url: "/dashboard/developer/integration/sdks",
 					},
 					{
 						title: "Connect Providers",
@@ -284,27 +224,6 @@ const GROUPS = [
 				title: "Settings",
 				icon: Settings,
 				url: "/dashboard/account/settings",
-			},
-			{
-				title: "Billing",
-				icon: CreditCard,
-				items: [
-					{
-						title: "Subscription",
-						icon: Sparkles,
-						url: "/dashboard/account/billing/subscription",
-					},
-					{
-						title: "Billing History",
-						icon: History,
-						url: "/dashboard/account/billing/history",
-					},
-					{
-						title: "Cost Analytics",
-						icon: ChartBar,
-						url: "/dashboard/account/billing/analytics",
-					},
-				],
 			},
 		],
 	},

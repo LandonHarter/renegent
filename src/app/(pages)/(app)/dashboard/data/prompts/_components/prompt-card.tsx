@@ -32,8 +32,11 @@ export default function PromptCard({ prompt }: PromptCardProps) {
 	};
 
 	return (
-		<Link href={`/dashboard/data/prompt/${prompt.promptId}`}>
-			<Card className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md">
+		<Link
+			href={`/dashboard/data/prompt/${prompt.promptId}`}
+			className="h-full"
+		>
+			<Card className="h-[250px] transition-all duration-200 hover:scale-[1.01] hover:shadow-md">
 				<CardHeader className="pb-3">
 					<div className="flex items-start justify-between">
 						<div className="flex items-center gap-3">
@@ -57,35 +60,37 @@ export default function PromptCard({ prompt }: PromptCardProps) {
 						</div>
 					</div>
 				</CardHeader>
-				<CardContent className="pt-0">
-					<div className="space-y-3">
-						<div className="text-muted-foreground text-sm">
-							{truncateText(prompt.prompt)}
-						</div>
+				<CardContent className="h-full pt-0">
+					<div className="flex h-full flex-col justify-between">
+						<div className="flex flex-col gap-3">
+							<div className="text-muted-foreground text-sm">
+								{truncateText(prompt.prompt)}
+							</div>
 
-						{prompt.variables.length > 0 && (
-							<div className="flex flex-wrap gap-1">
-								{prompt.variables
-									.slice(0, 3)
-									.map((variable) => (
+							{prompt.variables.length > 0 && (
+								<div className="flex flex-wrap gap-1">
+									{prompt.variables
+										.slice(0, 3)
+										.map((variable) => (
+											<Badge
+												key={variable}
+												variant="outline"
+												className="text-xs"
+											>
+												{variable}
+											</Badge>
+										))}
+									{prompt.variables.length > 3 && (
 										<Badge
-											key={variable}
 											variant="outline"
 											className="text-xs"
 										>
-											{variable}
+											+{prompt.variables.length - 3} more
 										</Badge>
-									))}
-								{prompt.variables.length > 3 && (
-									<Badge
-										variant="outline"
-										className="text-xs"
-									>
-										+{prompt.variables.length - 3} more
-									</Badge>
-								)}
-							</div>
-						)}
+									)}
+								</div>
+							)}
+						</div>
 
 						<div className="text-muted-foreground space-y-1 text-xs">
 							<div className="flex justify-between">

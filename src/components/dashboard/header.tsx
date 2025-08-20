@@ -219,6 +219,21 @@ export const LINKS: Links[] = [
 			},
 		],
 	},
+	{
+		href: "/dashboard/developer/tools/playground",
+		items: [
+			{
+				title: "Developer",
+			},
+			{
+				title: "Tools",
+			},
+			{
+				title: "Playground",
+				href: "/dashboard/developer/tools/playground",
+			},
+		],
+	},
 ];
 
 export default function DashboardHeader() {
